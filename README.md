@@ -21,20 +21,32 @@
   </a>
 </p>
 
-Inja is a template engine for modern C++, loosely inspired by [jinja](http://jinja.pocoo.org) for python. It has an easy and yet powerful template syntax with all variables, loops, conditions, includes, callbacks, and comments you need, nested and combined as you like. Of course, everything is tested in CI on all relevant compilers. Here is what it looks like:
+Inja is a template engine for modern C++, loosely inspired by [jinja](http://jinja.pocoo.org) for python - by [Berscheid](https://github.com/pantor). It has an easy and yet powerful template syntax with all variables, loops, conditions, includes, callbacks, and comments you need, nested and combined as you like. Of course, everything is tested in CI on all relevant compilers. Here is what it looks like:
 
-```.cpp
+```cpp
 json data;
 data["name"] = "world";
 
 inja::render("Hello {{ name }}!", data); // Returns "Hello world!"
 ```
 
+## Installation
+
+Run:
+```bash
+$ npm i inja.cxx
+```
+
+And then include `inja.hpp` as follows:
+```c
+#include "node_modules/inja.cxx/single_include/inja/inja.hpp"
+```
+
 ## Integration
 
-Inja is a headers only library, which can be downloaded from the [releases](https://github.com/pantor/inja/releases) or directly from the `include/` or `single_include/` folder. Inja uses `nlohmann/json.hpp` (>= v3.8.0) as its single dependency, so make sure it can be included from `inja.hpp`. json can be downloaded [here](https://github.com/nlohmann/json/releases). Then integration is as easy as:
+Inja uses `nlohmann/json.hpp` (>= v3.8.0) as its single dependency, so make sure it can be included from `inja.hpp`. json can be downloaded [here](https://github.com/nlohmann/json/releases). Then integration is as easy as:
 
-```.cpp
+```cpp
 #include <inja.hpp>
 
 // Just for convenience
@@ -63,7 +75,7 @@ This tutorial will give you an idea how to use inja. It will explain the most im
 
 The basic template rendering takes a template as a `std::string` and a `json` object for all data. It returns the rendered template as an `std::string`.
 
-```.cpp
+```cpp
 json data;
 data["name"] = "world";
 
@@ -72,7 +84,7 @@ render_to(std::cout, "Hello {{ name }}!", data); // Writes "Hello world!" to str
 ```
 
 For more advanced usage, an environment is recommended.
-```.cpp
+```cpp
 Environment env;
 
 // Render a string with json data
@@ -95,7 +107,7 @@ env.write_with_json_file("./templates/greeting.txt", "./data.json", "./result.tx
 ```
 
 The environment class can be configured to your needs.
-```.cpp
+```cpp
 // With default settings
 Environment env_default;
 
@@ -116,7 +128,7 @@ env.set_html_autoescape(true); // Perform HTML escaping on all strings
 ### Variables
 
 Variables are rendered within the `{{ ... }}` expressions.
-```.cpp
+```cpp
 json data;
 data["neighbour"] = "Peter";
 data["guests"] = {"Jeff", "Tom", "Patrick"};
@@ -137,7 +149,7 @@ Statements can be written either with the `{% ... %}` syntax or the `##` syntax 
 
 #### Loops
 
-```.cpp
+```cpp
 // Combining loops and line statements
 render(R"(Guest List:
 ## for guest in guests
@@ -154,7 +166,7 @@ In a loop, the special variables `loop.index (number)`, `loop.index1 (number)`, 
 #### Conditions
 
 Conditions support the typical if, else if and else statements. Following conditions are for example possible:
-```.cpp
+```cpp
 // Standard comparisons with a variable
 render("{% if time.hour >= 20 %}Serve{% else if time.hour >= 18 %}Make{% endif %} dinner.", data); // Serve dinner.
 
@@ -171,7 +183,7 @@ render("{% if not guest_count %}The End{% endif %}", data); // The End
 #### Includes
 
 You can either include other in-memory templates or from the file system.
-```.cpp
+```cpp
 // To include in-memory templates, add them to the environment first
 inja::Template content_template = env.parse("Hello {{ neighbour }}!");
 env.include_template("content", content_template);
@@ -181,7 +193,7 @@ env.render("Content: {% include \"content\" %}", data); // "Content: Hello Peter
 render("{% include \"footer.html\" %}", data);
 ```
 If a corresponding template could not be found in the file system, the *include callback* is called:
-```.cpp
+```cpp
 // The callback takes the current path and the wanted include name and returns a template
 env.set_include_callback([&env](const std::filesystem::path& path, const std::string& template_name) {
   return env.parse("Hello {{ neighbour }} from " + template_name);
@@ -196,7 +208,7 @@ Inja will throw an `inja::RenderError` if an included file is not found and no c
 #### Assignments
 
 Variables can also be defined within the template using the set statment.
-```.cpp
+```cpp
 render("{% set new_hour=23 %}{{ new_hour }}pm", data); // "23pm"
 render("{% set time.start=18 %}{{ time.start }}pm", data); // using json pointers
 ```
@@ -206,7 +218,7 @@ Assignments only set the value within the rendering context; they do not modify 
 ### Functions
 
 A few functions are implemented within the inja template syntax. They can be called with
-```.cpp
+```cpp
 // Upper, lower and capitalize function, for string cases
 render("Hello {{ upper(neighbour) }}!", data); // "Hello PETER!"
 render("Hello {{ lower(neighbour) }}!", data); // "Hello peter!"
@@ -272,7 +284,7 @@ render("{{ isArray(guests) }}", data); // "true"
 
 The Jinja2 pipe call syntax of functions is also supported:
 
-```.cpp
+```cpp
 // Upper neighbour value
 render("Hello {{ neighbour | upper }}!", data); // "Hello PETER!"
 
@@ -283,7 +295,7 @@ render("{{ [\"B\", \"A\", \"C\"] | sort | join(\",\") }}", data); // "A,B,C"
 ### Callbacks
 
 You can create your own and more complex functions with callbacks. These are implemented with `std::function`, so you can for example use C++ lambdas. Inja `Arguments` are a vector of json pointers.
-```.cpp
+```cpp
 Environment env;
 
 /*
@@ -316,7 +328,7 @@ env.add_callback("double-greetings", 0, [greet](Arguments args) {
 env.render("{{ double-greetings }}", data); // "Hello Hello!"
 ```
 You can also add a void callback without return variable, e.g. for debugging:
-```.cpp
+```cpp
 env.add_void_callback("log", 1, [greet](Arguments args) {
 	std::cout << "logging: " << args[0] << std::endl;
 });
@@ -363,7 +375,7 @@ calls a parent template with the `extends` keyword; it should be the first eleme
 
 In the default configuration, no whitespace is removed while rendering the file. To support a more readable template style, you can configure the environment to control whitespaces before and after a statement automatically. While enabling `set_trim_blocks` removes the first newline after a statement, `set_lstrip_blocks` strips tabs and spaces from the beginning of a line to the start of a block.
 
-```.cpp
+```cpp
 Environment env;
 env.set_trim_blocks(true);
 env.set_lstrip_blocks(true);
@@ -371,7 +383,7 @@ env.set_lstrip_blocks(true);
 
 With both `trim_blocks` and `lstrip_blocks` enabled, you can put statements on their own lines. Furthermore, you can also strip whitespaces for both statements and expressions by hand. If you add a minus sign (`-`) to the start or end, the whitespaces before or after that block will be removed:
 
-```.cpp
+```cpp
 render("Hello       {{- name -}}     !", data); // "Hello Inja!"
 render("{% if neighbour in guests -%}   I was there{% endif -%}   !", data); // Renders without any whitespaces
 ```
@@ -388,7 +400,7 @@ HTML escape each and every string created.
 ### Comments
 
 Comments can be written with the `{# ... #}` syntax.
-```.cpp
+```cpp
 render("Hello{# Todo #}!", data); // "Hello!"
 ```
 
@@ -406,3 +418,10 @@ Inja uses the `string_view` feature of the C++17 STL. Currently, the following c
 - Microsoft Visual C++ 2017 15.0 - 2022 (and possibly later)
 
 A list of supported compiler / os versions can be found in the [CI definition](https://github.com/pantor/inja/blob/master/.github/workflows/ci.yml).
+
+<br>
+<br>
+
+
+[![ORG](https://img.shields.io/badge/org-nodef-green?logo=Org)](https://nodef.github.io)
+![](https://ga-beacon.deno.dev/G-RC63DPBH3P:SH3Eq-NoQ9mwgYeHWxu7cw/github.com/nodef/inja.cxx)

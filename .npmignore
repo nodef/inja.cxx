@@ -1,0 +1,6 @@
+.github/
+doc/
+scripts/
+test/
+third_party/
+.clang-tidy
