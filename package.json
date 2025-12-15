@@ -1,0 +1,22 @@
+{
+  "name": "inja.cxx",
+  "version": "3.5.0",
+  "description": "A Template Engine for Modern C++; Berscheid (2017).",
+  "keywords": [
+    "c++",
+    "library",
+    "template",
+    "engine",
+    "jinja"
+  ],
+  "homepage": "https://github.com/nodef/inja.cxx#readme",
+  "bugs": {
+    "url": "https://github.com/nodef/inja.cxx/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nodef/inja.cxx.git"
+  },
+  "license": "MIT",
+  "main": "inja.h"
+}
